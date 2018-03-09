@@ -39,12 +39,17 @@ bool file_byte_source::depleted() {
 }
 
 //----------------------------------------------------------------------
-size_t file_byte_source::available() {
+uint64_t file_byte_source::available() {
     return _reader->size() - _position;
 }
 
 //----------------------------------------------------------------------
-void file_byte_source::seek(size_t position) {
+uint64_t file_byte_source::position() {
+    return _position;
+}
+
+//----------------------------------------------------------------------
+void file_byte_source::seek(uint64_t position) {
     if (position > _reader->size()) {
         throw std::range_error("Cannot seek beyond file size");
     }
@@ -53,7 +58,7 @@ void file_byte_source::seek(size_t position) {
 }
 
 //----------------------------------------------------------------------
-void file_byte_source::skip(size_t bytes) {
+void file_byte_source::skip(uint64_t bytes) {
     if (bytes > available()) {
         throw std::range_error("Cannot skip beyond file size");
     }
@@ -66,4 +71,15 @@ void file_byte_source::load_buffer()
 {
     auto read = _reader->read(_buffer.get(), _position, _buffer.capacity());
     _buffer.resize(read);
+    _last = _position;
+}
+
+//----------------------------------------------------------------------
+std::shared_ptr<file_byte_source> file_byte_source::clone()
+{
+    auto ret = std::make_shared<file_byte_source>(_reader->clone());
+    ret->_buffer = shared_buffer::clone(_buffer);
+    ret->_position = _position;
+    ret->_last = _last;
+    return ret;
 }
