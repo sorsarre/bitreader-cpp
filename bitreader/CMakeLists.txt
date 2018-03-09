@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -pedantic")
 
 set(BITREADER_SOURCES
-        src/bitreader.cpp
         src/common/direct_file_reader.cpp
         src/common/shared_buffer.cpp
         src/data_source/file_byte_source.cpp
