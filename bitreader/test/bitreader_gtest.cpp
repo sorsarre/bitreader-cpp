@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <bitreader/data_source/memory_byte_source.hpp>
 #include "bitreader/bitreader.hpp"
+#include "bitreader/codings/exp-golomb-k0.hpp"
 
 using namespace brcpp;
 
@@ -260,4 +261,19 @@ TEST(bitreaderTest, align_lt_byte_unaligned)
     EXPECT_EQ(2, br.position());
     EXPECT_NO_THROW(br.align(5));
     EXPECT_EQ(5, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, exp_golomb_k0)
+{
+    const uint8_t data[] = {0b1'010'011'0, 0b0100'0000 };
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+
+    using egc = brcpp::ext::exp_golomb_k0<uint8_t>;
+
+    EXPECT_EQ(0, br.read<egc>());
+    EXPECT_EQ(1, br.read<egc>());
+    EXPECT_EQ(2, br.read<egc>());
+    EXPECT_EQ(3, br.read<egc>());
 }
