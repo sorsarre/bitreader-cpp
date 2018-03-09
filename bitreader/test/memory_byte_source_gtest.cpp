@@ -98,3 +98,17 @@ TEST(memoryByteSourceTest, seek)
     EXPECT_EQ(size/2 + 1, src.get());
     EXPECT_EQ(size/2, src.available());
 }
+
+//------------------------------------------------------------------------------
+TEST(memoryByteSourceTest, clone)
+{
+    const size_t size = 10;
+    auto data = generate_test_data(size);
+    memory_byte_source src(data, size);
+
+    EXPECT_NO_THROW(src.seek(size/2));
+    auto clone = src.clone();
+    EXPECT_EQ(src.position(), clone->position());
+    EXPECT_EQ(src.available(), clone->available());
+    EXPECT_EQ(src.get(), clone->get());
+}

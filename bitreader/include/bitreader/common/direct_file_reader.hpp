@@ -18,11 +18,13 @@ namespace brcpp
         uint64_t size() override;
         bool depleted() override;
         ~direct_file_reader() override;
+        std::shared_ptr<file_reader> clone() override;
         static std::shared_ptr<file_reader> open(const std::string& path);
 
     private:
         explicit direct_file_reader(const std::string& path);
 
+        const std::string _path;
         FILE* _file;
     };
 }

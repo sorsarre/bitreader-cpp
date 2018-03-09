@@ -53,6 +53,13 @@ namespace {
         }
 
         //----------------------------------------------------------------------
+        std::shared_ptr<file_reader> clone() override
+        {
+            auto ret = new fake_file_reader(*this);
+            return std::shared_ptr<file_reader>(ret);
+        }
+
+        //----------------------------------------------------------------------
         bool depleted() override
         {
             return true;
@@ -62,6 +69,11 @@ namespace {
         ~fake_file_reader() override = default;
 
     private:
+        fake_file_reader(const fake_file_reader& other)
+        {
+            _data = shared_buffer::clone(other._data);
+        }
+
         shared_buffer _data;
     };
 }

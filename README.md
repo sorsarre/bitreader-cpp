@@ -5,7 +5,7 @@ At the time of writing, there was no de-facto standard library for bitwise readi
 Most people either resorted to ugly unreadable hand-coded bitmask masturbation or to wheel reinvention.
 
 After witnessing more than a couple of dozens of half-arsed, ad-hoc, bug-ridden implementations
-(and having taken part in writing at least what, three of those?), I though that writing another one of
+(and having taken part in writing at least what, three of those?), I thought that writing another one of
 them ugly crafty home-made wheels was a good fscking idea, so here we are.
 
 ## Examples

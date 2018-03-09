@@ -1,88 +1,74 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
-#include <type_traits>
 #include <cassert>
 #include <stdexcept>
+#include <memory>
+
+#include <bitreader/bitreader-utils.hpp>
 
 namespace brcpp {
-    template<typename T>
-    using if_unsigned_integral = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, T>;
 
-    template<typename T>
-    using if_signed_integral = std::enable_if_t<std::is_signed_v<T> && std::is_integral_v<T>, T>;
-
-    template<typename T>
-    using if_integral = std::enable_if_t<std::is_integral_v<T>, T>;
-
-    template<typename T>
-    using if_floating_point = std::enable_if_t<std::is_floating_point_v<T>, T>;
-
-    template<typename T>
-    using if_bit_readable = std::enable_if_t<std::is_floating_point_v<T> || std::is_integral_v<T>, T>;
 
     //--------------------------------------------------------------------------
-    template<typename T>
-    struct bit_read_helper
-    {
-        static constexpr const size_t max_bits = 8 * sizeof(T);
-        static constexpr const size_t min_bits = 0;
-        static constexpr const bool is_signed = std::is_signed_v<T>;
-    };
-
-    //--------------------------------------------------------------------------
-    template<typename T>
-    struct floating_point_bit_read_helper
-    {
-        static constexpr const size_t max_bits = 8 * sizeof(T);
-        static constexpr const size_t min_bits = 8 * sizeof(T);
-        static constexpr const bool is_signed = std::is_signed_v<T>;
-    };
-
-    //--------------------------------------------------------------------------
-    template<> struct bit_read_helper<float>: floating_point_bit_read_helper<float> {};
-    template<> struct bit_read_helper<double>: floating_point_bit_read_helper<double> {};
-    template<> struct bit_read_helper<long double>: floating_point_bit_read_helper<long double> {};
-
-    //--------------------------------------------------------------------------
+    template<typename Source>
     class bitreader {
     public:
-        bitreader();
+        bitreader(std::shared_ptr<Source> source)
+        {
+            _state.source = source;
+            _next(_state);
+        }
 
-        /**
-         * Set the buffer to read from
-         * @param data Pointer to the data
-         * @param length Length of the input buffer
-         */
-        void set_data(const uint8_t* data, size_t length);
+        bitreader(const bitreader&) = delete;
+        bitreader& operator=(const bitreader&) = delete;
 
         /**
          * @return Current position in the input stream (in bits)
          */
-        size_t position() const;
+        size_t position() const
+        {
+            return _position(_state);
+        }
 
         /**
          * @return The number of bits available for reading
          */
-        size_t available() const;
+        size_t available() const
+        {
+            return _available(_state);
+        }
 
         /**
          * @brief Set the current position in the input stream
          * @param bitpos Position to seek towards
          */
-        void seek(size_t bitpos);
+        void seek(size_t bitpos)
+        {
+            uint64_t byte_pos = bitpos / 8;
+            uint64_t bits_to_skip = bitpos % 8;
+
+            _state.source->seek(byte_pos);
+            _skip(_state, bits_to_skip);
+        }
 
         /**
          * @brief Skips the necessary number of bits to ensure alignment
          * @param bits Number of bits to align for
          */
-        void align(size_t bits);
+        void align(size_t bits)
+        {
+            _align(_state, bits);
+        }
 
         /**
          * @brief Skip the specified number of bits in the stream
          * @param bits Number of bits to skip
          */
-        void skip(size_t bits);
+        void skip(size_t bits)
+        {
+            _skip(_state, bits);
+        }
 
         //----------------------------------------------------------------------
         /**
@@ -98,6 +84,12 @@ namespace brcpp {
             T ret = T(0);
             _read(_state, bits, ret);
             return _sign_extend(ret, bits);
+        }
+
+        template<typename T>
+        if_binary_codec<T> read()
+        {
+            return T::read(*this);
         }
 
         //----------------------------------------------------------------------
@@ -121,7 +113,16 @@ namespace brcpp {
         struct internal_state {
             uint64_t buffer = 0;
             size_t shift = 0;
-            const uint8_t* ptr = nullptr;
+            std::shared_ptr<Source> source;
+
+            internal_state clone()
+            {
+                return internal_state{
+                    buffer,
+                    shift,
+                    source->clone()
+                };
+            }
         };
 
         //----------------------------------------------------------------------
@@ -140,11 +141,62 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
-        void _next(internal_state& state) const;
-        void _skip(internal_state& state, size_t bits) const;
-        size_t _position(const internal_state& state) const;
-        size_t _available(const internal_state& state) const;
-        void _align(internal_state& state, size_t bits) const;
+        void _next(internal_state& state) const
+        {
+            size_t available = std::min<size_t>(
+                    sizeof(state.buffer),
+                    state.source->available());
+
+            size_t to_read = available;
+            while (to_read) {
+                state.buffer <<= 8;
+                state.buffer |= state.source->get();
+                state.source->next();
+                --to_read;
+            }
+            state.shift = 8 * available;
+        }
+
+        //----------------------------------------------------------------------
+        void _skip(internal_state& state, size_t bits) const
+        {
+            if (_available(state) < bits) {
+                throw std::runtime_error("Cannot skip beyond end of bitstream");
+            }
+
+            if (bits < state.shift) {
+                state.shift -= bits;
+            } else if (bits == state.shift) {
+                _next(state);
+            } else {
+                size_t to_skip = bits - state.shift;
+                state.shift = 0;
+                state.source->skip(to_skip / 8);
+                _next(state);
+                state.shift -= to_skip % 8;
+            }
+        }
+
+        //----------------------------------------------------------------------
+        size_t _position(const internal_state& state) const
+        {
+            return state.source->position() * 8 - state.shift;
+        }
+
+        //----------------------------------------------------------------------
+        size_t _available(const internal_state& state) const
+        {
+            return state.source->available() * 8 + state.shift;
+        }
+
+        //----------------------------------------------------------------------
+        void _align(internal_state& state, size_t bits) const
+        {
+            size_t advance = (bits - (_position(state) % bits)) % bits;
+            if (advance > 0) {
+                _skip(state, advance);
+            }
+        }
 
         //----------------------------------------------------------------------
         template<typename T>
@@ -187,7 +239,7 @@ namespace brcpp {
         template<typename T>
         void _peek(internal_state& state, size_t bits, T& ret) const
         {
-            internal_state temporary = state;
+            internal_state temporary = state.clone();
             _read(temporary, bits, ret);
         }
 
@@ -208,8 +260,6 @@ namespace brcpp {
         }
 
         internal_state _state;
-        const uint8_t* _data;
-        const uint8_t* _data_end;
     };
 
 }

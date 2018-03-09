@@ -41,13 +41,19 @@ bool memory_byte_source::depleted()
 }
 
 //----------------------------------------------------------------------
-size_t memory_byte_source::available()
+uint64_t memory_byte_source::available()
 {
     return _data.end() - _current;
 }
 
 //----------------------------------------------------------------------
-void memory_byte_source::seek(size_t position)
+uint64_t memory_byte_source::position()
+{
+    return _current - _data.begin();
+}
+
+//----------------------------------------------------------------------
+void memory_byte_source::seek(uint64_t position)
 {
     if (position > _data.size()) {
         throw std::range_error("Position outside of the data buffer");
@@ -57,11 +63,20 @@ void memory_byte_source::seek(size_t position)
 }
 
 //----------------------------------------------------------------------
-void memory_byte_source::skip(size_t bytes)
+void memory_byte_source::skip(uint64_t bytes)
 {
     if (bytes > available()) {
         throw std::range_error("Cannot skip beyond the boundaries of the data buffer");
     }
 
     _current += bytes;
+}
+
+//----------------------------------------------------------------------
+std::shared_ptr<memory_byte_source> memory_byte_source::clone()
+{
+    auto ret = std::make_shared<memory_byte_source>();
+    ret->_data = shared_buffer::clone(_data);
+    ret->_current = ret->_data.begin() + position();
+    return ret;
 }

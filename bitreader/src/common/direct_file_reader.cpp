@@ -40,9 +40,17 @@ std::shared_ptr<file_reader> direct_file_reader::open(const std::string& path) {
 
 //----------------------------------------------------------------------
 direct_file_reader::direct_file_reader(const std::string& path)
+    : _path(path)
 {
     _file = fopen64(path.c_str(), "rb");
     if (!_file) {
         throw std::runtime_error("Could not open file for reading");
     }
+}
+
+//----------------------------------------------------------------------
+std::shared_ptr<file_reader> direct_file_reader::clone()
+{
+    auto ret = new direct_file_reader(_path);
+    return std::shared_ptr<file_reader>(ret);
 }

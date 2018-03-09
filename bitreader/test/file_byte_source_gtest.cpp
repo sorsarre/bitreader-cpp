@@ -74,6 +74,7 @@ TEST(fileByteSourceTest, skip)
     EXPECT_EQ(1, src.get());
     EXPECT_EQ(size, src.available());
     EXPECT_NO_THROW(src.skip(size/2));
+    EXPECT_EQ(src.position(), size/2);
     EXPECT_EQ(size/2 + 1, src.get());
     EXPECT_EQ(size/2, src.available());
 
@@ -92,6 +93,7 @@ TEST(fileByteSourceTest, seek)
     EXPECT_EQ(1, src.get());
     EXPECT_EQ(size, src.available());
     EXPECT_NO_THROW(src.seek(size/2));
+    EXPECT_EQ(src.position(), size/2);
     EXPECT_EQ(size/2 + 1, src.get());
     EXPECT_EQ(size/2, src.available());
 
@@ -99,3 +101,19 @@ TEST(fileByteSourceTest, seek)
     EXPECT_EQ(size/2 + 1, src.get());
     EXPECT_EQ(size/2, src.available());
 }
+
+//------------------------------------------------------------------------------
+TEST(fileByteSourceTest, clone)
+{
+    const size_t size = 10;
+    auto data = std::make_shared<fake_file_reader>(size);
+    file_byte_source src(data);
+
+    EXPECT_NO_THROW(src.seek(size/2));
+    auto clone = src.clone();
+
+    EXPECT_EQ(src.position(), clone->position());
+    EXPECT_EQ(src.available(), clone->available());
+    EXPECT_EQ(src.get(), clone->get());
+}
+

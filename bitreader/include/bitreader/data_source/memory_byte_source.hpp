@@ -14,9 +14,11 @@ namespace brcpp
         uint8_t get();
         void next();
         bool depleted();
-        size_t available();
-        void seek(size_t position);
-        void skip(size_t bytes);
+        uint64_t available();
+        uint64_t position();
+        void seek(uint64_t position);
+        void skip(uint64_t bytes);
+        std::shared_ptr<memory_byte_source> clone();
     private:
         shared_buffer::iterator _current;
         shared_buffer _data;
