@@ -48,14 +48,49 @@ namespace brcpp {
     class bitreader {
     public:
         bitreader();
+
+        /**
+         * Set the buffer to read from
+         * @param data Pointer to the data
+         * @param length Length of the input buffer
+         */
         void set_data(const uint8_t* data, size_t length);
+
+        /**
+         * @return Current position in the input stream (in bits)
+         */
         size_t position() const;
+
+        /**
+         * @return The number of bits available for reading
+         */
         size_t available() const;
+
+        /**
+         * @brief Set the current position in the input stream
+         * @param bitpos Position to seek towards
+         */
         void seek(size_t bitpos);
+
+        /**
+         * @brief Skips the necessary number of bits to ensure alignment
+         * @param bits Number of bits to align for
+         */
         void align(size_t bits);
+
+        /**
+         * @brief Skip the specified number of bits in the stream
+         * @param bits Number of bits to skip
+         */
         void skip(size_t bits);
 
         //----------------------------------------------------------------------
+        /**
+         * @brief       Reads the binary data.
+         * @tparam T    Type to read into (uintXX_t/intXX_t)
+         * @param bits  Number of bits to read
+         * @return      The data read from the stream
+         */
         template<typename T>
         if_integral<T> read(size_t bits)
         {
@@ -66,6 +101,12 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
+        /**
+         * @brief       Read the binary data without advancing the position.
+         * @tparam T    Type to read into (uintXX_t/intXX_t)
+         * @param bits  Number of bits to read
+         * @return      The data read from the stream
+         */
         template<typename T>
         if_integral<T> peek(size_t bits)
         {
