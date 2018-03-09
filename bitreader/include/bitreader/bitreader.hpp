@@ -1,49 +1,14 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
-#include <type_traits>
 #include <cassert>
 #include <stdexcept>
 #include <memory>
 
+#include <bitreader/bitreader-utils.hpp>
+
 namespace brcpp {
-    template<typename T>
-    using if_unsigned_integral = std::enable_if_t<std::is_unsigned_v<T> && std::is_integral_v<T>, T>;
 
-    template<typename T>
-    using if_signed_integral = std::enable_if_t<std::is_signed_v<T> && std::is_integral_v<T>, T>;
-
-    template<typename T>
-    using if_integral = std::enable_if_t<std::is_integral_v<T>, T>;
-
-    template<typename T>
-    using if_floating_point = std::enable_if_t<std::is_floating_point_v<T>, T>;
-
-    template<typename T>
-    using if_bit_readable = std::enable_if_t<std::is_floating_point_v<T> || std::is_integral_v<T>, T>;
-
-    //--------------------------------------------------------------------------
-    template<typename T>
-    struct bit_read_helper
-    {
-        static constexpr const size_t max_bits = 8 * sizeof(T);
-        static constexpr const size_t min_bits = 0;
-        static constexpr const bool is_signed = std::is_signed_v<T>;
-    };
-
-    //--------------------------------------------------------------------------
-    template<typename T>
-    struct floating_point_bit_read_helper
-    {
-        static constexpr const size_t max_bits = 8 * sizeof(T);
-        static constexpr const size_t min_bits = 8 * sizeof(T);
-        static constexpr const bool is_signed = std::is_signed_v<T>;
-    };
-
-    //--------------------------------------------------------------------------
-    template<> struct bit_read_helper<float>: floating_point_bit_read_helper<float> {};
-    template<> struct bit_read_helper<double>: floating_point_bit_read_helper<double> {};
-    template<> struct bit_read_helper<long double>: floating_point_bit_read_helper<long double> {};
 
     //--------------------------------------------------------------------------
     template<typename Source>
@@ -119,6 +84,12 @@ namespace brcpp {
             T ret = T(0);
             _read(_state, bits, ret);
             return _sign_extend(ret, bits);
+        }
+
+        template<typename T>
+        if_binary_codec<T> read()
+        {
+            return T::read(*this);
         }
 
         //----------------------------------------------------------------------
