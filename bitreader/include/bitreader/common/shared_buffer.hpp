@@ -66,4 +66,19 @@ namespace brcpp
 
         std::shared_ptr<_internal> _state;
     };
+
+    //--------------------------------------------------------------------------
+    template<typename T>
+    shared_buffer wrap_object_into_buffer(T* obj)
+    {
+        auto obj_data = reinterpret_cast<uint8_t*>(obj);
+        return shared_buffer::wrap_mem(obj_data, sizeof(*obj));
+    }
+
+    //--------------------------------------------------------------------------
+    template<typename T>
+    const T* shared_buffer_cast(const shared_buffer& buf)
+    {
+        return reinterpret_cast<const T*>(buf.get());
+    }
 }
