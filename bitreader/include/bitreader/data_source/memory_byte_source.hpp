@@ -11,8 +11,7 @@ namespace brcpp
     public:
         memory_byte_source();
         memory_byte_source(const uint8_t* data, size_t size);
-        uint8_t get();
-        void next();
+        size_t get_n(uint64_t& buf, size_t bytes);
         bool depleted();
         uint64_t available();
         uint64_t position();

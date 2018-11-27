@@ -11,8 +11,7 @@ namespace brcpp
     {
     public:
         explicit file_byte_source(std::shared_ptr<file_reader> reader);
-        uint8_t get();
-        void next();
+        size_t get_n(uint64_t& buf, size_t bytes);
         bool depleted();
         uint64_t available();
         uint64_t position();

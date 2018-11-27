@@ -148,13 +148,8 @@ namespace brcpp {
                     state.source->available());
 
             size_t to_read = available;
-            while (to_read) {
-                state.buffer <<= 8;
-                state.buffer |= state.source->get();
-                state.source->next();
-                --to_read;
-            }
-            state.shift = 8 * available;
+            size_t done_read = state.source->get_n(state.buffer, to_read);
+            state.shift = 8 * done_read;
         }
 
         //----------------------------------------------------------------------
@@ -225,7 +220,7 @@ namespace brcpp {
                 _elementary_read(state, bits, ret);
             } else if (bits == state.shift) {
                 _elementary_read(state, bits, ret);
-                _next(state);
+                //_next(state);
             } else {
                 bits -= state.shift;
                 _elementary_read(state, state.shift, ret);

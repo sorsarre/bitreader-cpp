@@ -11,10 +11,10 @@ file_byte_source::file_byte_source(std::shared_ptr<file_reader> reader)
 }
 
 //----------------------------------------------------------------------
-uint8_t file_byte_source::get() {
+size_t file_byte_source::get_n(uint64_t& buf, size_t bytes) {
     if (
             _position < _last ||
-            _position >= _last + _buffer.size() ||
+            _position + bytes >= _last + _buffer.size() ||
             _buffer.size() == 0)
     {
         load_buffer();
@@ -23,14 +23,15 @@ uint8_t file_byte_source::get() {
     if (_buffer.size() == 0 && available() == 0) {
         throw std::runtime_error("Cannot read beyond the end of the file");
     }
-    return _buffer.get()[_position - _last];
-}
 
-//----------------------------------------------------------------------
-void file_byte_source::next() {
-    if (available() > 0) {
+    auto to_shift = std::min(available(), bytes);
+    for (size_t iter = 0; iter < to_shift; ++iter) {
+        buf <<= 8;
+        buf |= _buffer.get()[_position - _last];
         ++_position;
     }
+
+    return to_shift;
 }
 
 //----------------------------------------------------------------------

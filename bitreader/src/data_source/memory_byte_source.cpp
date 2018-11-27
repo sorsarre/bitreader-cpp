@@ -16,21 +16,20 @@ memory_byte_source::memory_byte_source(const uint8_t* data, size_t size)
 }
 
 //----------------------------------------------------------------------
-uint8_t memory_byte_source::get()
+size_t memory_byte_source::get_n(uint64_t& buf, size_t bytes)
 {
     if (_current == _data.end()) {
         throw std::runtime_error("Access beyond data buffer boundaries");
     }
 
-    return *_current;
-}
-
-//----------------------------------------------------------------------
-void memory_byte_source::next()
-{
-    if (_current != _data.end()) {
+    auto to_shift = std::min(bytes, available());
+    for (size_t iter = 0; iter < to_shift; ++iter) {
+        buf <<= 8;
+        buf |= *_current;
         ++_current;
     }
+
+    return to_shift;
 }
 
 //----------------------------------------------------------------------
