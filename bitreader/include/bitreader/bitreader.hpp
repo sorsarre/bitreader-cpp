@@ -92,6 +92,14 @@ namespace brcpp {
             return T::read(*this);
         }
 
+        template<typename T>
+        if_enum<T> read(size_t bits)
+        {
+            using value_type = std::underlying_type_t<T>;
+            auto val = static_cast<T>(read<value_type>(bits));
+            return val;
+        }
+
         //----------------------------------------------------------------------
         template<typename T>
         void read(size_t bits, T& out)
