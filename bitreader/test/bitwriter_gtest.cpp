@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <bitreader/bitwriter.hpp>
+#include <bitreader/codings/string-nullterm.hpp>
 #include <vector>
 
 using namespace brcpp;
@@ -197,3 +198,14 @@ TEST(bitwriterTest, TestSkip)
     w.flush();
     EXPECT_EQ(bytes({0x60, 0x00, 0x70}), sink->data());
 }
+
+//------------------------------------------------------------------------------
+TEST(bitwriterTest, TestStringWriter)
+{
+    auto sink = std::make_shared<TestWriterSink>();
+    bitwriter w{sink};
+
+    w.write<ext::string_nullterm>("test");
+    EXPECT_EQ(bytes({'t', 'e', 's', 't', '\0'}), sink->data());
+}
+
