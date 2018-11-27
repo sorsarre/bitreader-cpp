@@ -10,6 +10,10 @@ target_include_directories(bitreader_gtest PRIVATE ${GTEST_INCLUDE_DIRS})
 target_link_libraries(bitreader_gtest bitreadercpp)
 target_link_libraries(bitreader_gtest ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(bitreader_gtest pthread)
+set_target_properties(bitreader_gtest PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        )
 
 add_test(AllTestsBitreader bitreader_gtest)
 
@@ -26,5 +30,9 @@ target_include_directories(common_gtest PRIVATE ${GTEST_INCLUDE_DIRS})
 target_link_libraries(common_gtest bitreadercpp)
 target_link_libraries(common_gtest ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(common_gtest pthread)
+set_target_properties(common_gtest PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        )
 
 add_test(AllTestsCommon common_gtest)
