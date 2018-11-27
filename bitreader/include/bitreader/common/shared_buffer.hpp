@@ -43,6 +43,7 @@ namespace brcpp
         void realloc(size_t new_size);
         void resize(size_t new_size);
         operator bool() const;
+        uint8_t operator[](size_t index) const { return get()[index]; }
 
     private:
         //----------------------------------------------------------------------
