@@ -93,6 +93,13 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
+        template<typename T>
+        void read(size_t bits, T& out)
+        {
+            out = this->read<T>(bits);
+        }
+
+        //----------------------------------------------------------------------
         /**
          * @brief       Read the binary data without advancing the position.
          * @tparam T    Type to read into (uintXX_t/intXX_t)
