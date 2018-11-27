@@ -43,13 +43,13 @@ bool memory_byte_source::depleted()
 //----------------------------------------------------------------------
 uint64_t memory_byte_source::available()
 {
-    return _data.end() - _current;
+    return static_cast<uint64_t>(_data.end() - _current);
 }
 
 //----------------------------------------------------------------------
 uint64_t memory_byte_source::position()
 {
-    return _current - _data.begin();
+    return static_cast<uint64_t>(_current - _data.begin());
 }
 
 //----------------------------------------------------------------------
