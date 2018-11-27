@@ -21,7 +21,10 @@ them ugly crafty home-made wheels was a good fscking idea, so here we are.
 * Examples
 * API documentation
 * Emulation prevention support
-* Make the brcpp::bitreader use byte source abstraction instead of raw buffers
-* Some sort of abstraction for arithmetic coding reading (can be implemented on top, but that stuff is pretty common)
+* [DONE] Make the brcpp::bitreader use byte source abstraction instead of raw buffers
+* [DONE] Some sort of abstraction for arithmetic coding reading (can be implemented on top, but that stuff is pretty common)
+    * [READ] Exponential Golomb coding with k=0
+    * [READ/WRITE] Null-terminated strings
+* [DONE] Reading enum values without casting around
 * IEEE-754 floats (16, 32, 64, 128 bits -- no idea though what to put the 128-bit one into)
 * Fixed point aka QM.N
