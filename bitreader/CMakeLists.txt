@@ -9,6 +9,7 @@ set(BITREADER_SOURCES
 
 set(BITREADER_HEADERS
         include/bitreader/bitreader.hpp
+        include/bitreader/bitwriter.hpp
         include/bitreader/common/shared_buffer.hpp
         include/bitreader/common/direct_file_reader.hpp
         include/bitreader/common/file_reader.hpp
