@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <bitreader/bitwriter.hpp>
 #include <bitreader/codings/string-nullterm.hpp>
+#include <bitreader/codings/exp-golomb-k0.hpp>
 #include <vector>
 
 using namespace brcpp;
@@ -209,3 +210,13 @@ TEST(bitwriterTest, TestStringWriter)
     EXPECT_EQ(bytes({'t', 'e', 's', 't', '\0'}), sink->data());
 }
 
+//------------------------------------------------------------------------------
+TEST(bitwriterTest, TestExpGolombK0)
+{
+    auto sink = std::make_shared<TestWriterSink>();
+    bitwriter w{sink};
+
+    w.write<ext::exp_golomb_k0<uint8_t>>(0b1101);
+    w.flush();
+    EXPECT_EQ(bytes({0b00011010}), sink->data());
+}

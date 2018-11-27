@@ -25,5 +25,23 @@ namespace brcpp::ext
 
             return result-1;
         }
+
+        template<typename Writer>
+        static void write(Writer& w, T value)
+        {
+            if (value == T{0}) {
+                w.template write<uint8_t>(1, 1);
+            }
+            // x = 1'abcd
+            // encoded(x) = 00001abcd
+            size_t counter = 0;
+            while ((value >> counter) != 1) {
+                ++counter;
+            }
+
+            w.template write<T>(0, counter);
+            w.template write<uint8_t>(1, 1);
+            w.template write<T>(value, counter);
+        }
     };
 }
