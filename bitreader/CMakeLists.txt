@@ -23,8 +23,13 @@ target_include_directories(bitreadercpp PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include
 set_target_properties(bitreadercpp PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
-        COMPILE_FLAGS "-Wall -Werror -pedantic"
 )
+
+if (NOT WIN32)
+    set_target_properties(bitreadercpp PROPERTIES
+        COMPILE_FLAGS "-Wall -Werror -pedantic"
+    )
+endif()
 
 enable_testing()
 find_package(GTest)
