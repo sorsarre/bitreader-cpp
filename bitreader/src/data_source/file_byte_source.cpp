@@ -1,4 +1,5 @@
 #include "bitreader/data_source/file_byte_source.hpp"
+#include <stdexcept>
 
 using namespace brcpp;
 

@@ -1,4 +1,5 @@
 #include "bitreader/common/direct_file_reader.hpp"
+#include <stdexcept>
 
 using namespace brcpp;
 
