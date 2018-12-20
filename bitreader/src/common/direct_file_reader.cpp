@@ -3,9 +3,42 @@
 
 using namespace brcpp;
 
+#ifdef WIN32
+namespace
+{
+    int fseek64(FILE* file, uint64_t pos, int origin)
+    {
+        return _fseeki64(file, pos, origin);
+    }
+    
+    int64_t ftell64(FILE* file)
+    {
+        return _ftelli64(file);
+    }
+    
+    FILE* fopen64(const char* name, const char* mode)
+    {
+        return fopen(name, mode);
+    }
+}
+#else
+namespace
+{
+    int fseek64(FILE* file, uint64_t pos, int origin)
+    {
+        return fseeko64(file, pos, origin);
+    }
+    
+    int64_t ftell64(FILE* file)
+    {
+        return ftello64(file);
+    }
+}
+#endif
+
 //----------------------------------------------------------------------
 size_t direct_file_reader::read(uint8_t* dest, uint64_t position, size_t bytes) {
-    if (fseeko64(_file, position, SEEK_SET) < 0) {
+    if (fseek64(_file, position, SEEK_SET) < 0) {
         throw std::runtime_error("Could not seek to designated position");
     }
 
@@ -14,8 +47,8 @@ size_t direct_file_reader::read(uint8_t* dest, uint64_t position, size_t bytes) 
 
 //----------------------------------------------------------------------
 uint64_t direct_file_reader::size() {
-    fseeko64(_file, 0, SEEK_END);
-    auto result = ftello64(_file);
+    fseek64(_file, 0, SEEK_END);
+    auto result = ftell64(_file);
     if (result < 0) {
         throw std::runtime_error("Could not seek to the end of the file");
     }
