@@ -217,6 +217,7 @@ TEST(bitwriterTest, TestExpGolombK0)
     bitwriter w{sink};
 
     w.write<ext::exp_golomb_k0<uint8_t>>(0b1101);
+    w.write<ext::exp_golomb_k0<uint8_t>>(0b0);
     w.flush();
-    EXPECT_EQ(bytes({0b00011010}), sink->data());
+    EXPECT_EQ(bytes({0b00011011}), sink->data());
 }
