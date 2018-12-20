@@ -49,6 +49,7 @@ namespace brcpp {
             uint64_t bits_to_skip = bitpos % 8;
 
             _state.source->seek(byte_pos);
+            _state.shift = 0;
             _skip(_state, bits_to_skip);
         }
 
