@@ -31,6 +31,7 @@ namespace brcpp::ext
         {
             if (value == T{0}) {
                 w.template write<uint8_t>(1, 1);
+                return;
             }
             // x = 1'abcd
             // encoded(x) = 00001abcd
