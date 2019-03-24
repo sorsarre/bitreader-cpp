@@ -58,7 +58,7 @@ namespace brcpp {
             size_t to_write = bits;
 
             while (written < bits) {
-                size_t post = std::min(_state.avail, to_write);
+                size_t post = std::min<uint64_t>(_state.avail, to_write);
                 T portion = (data >> (bits - written - post)) & _mask<T>(post);
                 size_t diff = _state.avail - post;
                 _state.buffer |= portion << diff;

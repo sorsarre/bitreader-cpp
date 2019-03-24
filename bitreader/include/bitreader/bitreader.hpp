@@ -159,7 +159,7 @@ namespace brcpp {
         //----------------------------------------------------------------------
         void _next(internal_state& state) const
         {
-            size_t available = std::min<size_t>(
+            size_t available = std::min<uint64_t>(
                     sizeof(state.buffer),
                     state.source->available());
 
