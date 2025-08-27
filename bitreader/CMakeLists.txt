@@ -24,7 +24,10 @@ endfunction()
 brcpp_enable_sanitizer(${BRCPP_SANITIZER})
 
 if (NOT WIN32)
-    add_compile_options(-Wall -Wconversion -Wsign-conversion -Wshorten-64-to-32 -Werror -pedantic)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-Wshorten-64-to-32)
+    endif()
+    add_compile_options(-Wall -Wconversion -Wsign-conversion -Werror -pedantic)
 endif()
 
 set(BITREADER_SOURCES
