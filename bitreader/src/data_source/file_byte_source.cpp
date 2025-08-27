@@ -3,10 +3,12 @@
 
 using namespace brcpp;
 
+static constexpr const size_t InitialBufferSize = 32 * 1024;
+
 //----------------------------------------------------------------------
 file_byte_source::file_byte_source(std::shared_ptr<file_reader> reader)
         : _reader(std::move(reader)),
-          _buffer(shared_buffer::allocate(32 * 1024)) // TODO: Magic number, replace it
+          _buffer(shared_buffer::allocate(InitialBufferSize))
         , _position(0), _last(0) {
 
 }
