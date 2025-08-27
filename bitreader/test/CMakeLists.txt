@@ -11,7 +11,7 @@ target_link_libraries(bitreader_gtest bitreadercpp)
 target_link_libraries(bitreader_gtest ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(bitreader_gtest pthread)
 set_target_properties(bitreader_gtest PROPERTIES
-        CXX_STANDARD 17
+        CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         )
 
@@ -31,7 +31,7 @@ target_link_libraries(common_gtest bitreadercpp)
 target_link_libraries(common_gtest ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(common_gtest pthread)
 set_target_properties(common_gtest PROPERTIES
-        CXX_STANDARD 17
+        CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         )
 

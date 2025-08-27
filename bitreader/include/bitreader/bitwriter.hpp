@@ -6,7 +6,8 @@
 #include <memory>
 #include <deque>
 
-#include <bitreader/bitreader-utils.hpp>
+#include "bitreader-utils.hpp"
+#include "common/numeric.hpp"
 
 namespace brcpp {
     //--------------------------------------------------------------------------
@@ -115,7 +116,14 @@ namespace brcpp {
         template<typename T>
         static constexpr T _mask(size_t bits)
         {
-            return (bits == sizeof(T)*8) ? (~0) : ((T(1) << bits) - 1);
+            if (bits >= sizeof(T)*8)
+            {
+                return static_cast<T>(~zero<T>);
+            }
+            else
+            {
+                return static_cast<T>(one<T> << bits) - one<T>;
+            }
         }
 
         //----------------------------------------------------------------------

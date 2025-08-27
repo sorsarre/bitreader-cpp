@@ -26,7 +26,7 @@ namespace
 {
     int fseek64(FILE* file, uint64_t pos, int origin)
     {
-        return fseeko64(file, pos, origin);
+        return fseeko64(file, static_cast<loff_t>(pos), origin);
     }
     
     int64_t ftell64(FILE* file)

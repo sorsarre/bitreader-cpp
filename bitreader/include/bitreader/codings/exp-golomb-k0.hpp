@@ -13,12 +13,12 @@ namespace brcpp::ext
         static T read(Reader& br)
         {
             size_t counter = 0;
-            T result = T(0);
+            T result = zero<T>;
             while (br.template read<uint8_t>(1) == 0) {
                 ++counter;
             }
 
-            result = 1 << counter;
+            result = static_cast<T>(one<T> << counter);
             if (counter > 0) {
                 result |= br.template read<T>(counter);
             }
