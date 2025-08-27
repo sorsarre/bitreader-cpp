@@ -35,8 +35,8 @@ TEST(memoryByteSourceTest, emptyCtor)
 TEST(memoryByteSourceTest, basic)
 {
     const size_t size = 10;
-    auto data = generate_test_data(size);
-    memory_byte_source src(data, size);
+    std::unique_ptr<std::uint8_t[]> data{generate_test_data(size)};
+    memory_byte_source src(data.get(), size);
 
     for (size_t iter = 0; iter < size; ++iter) {
         EXPECT_EQ(size-iter, src.available());
@@ -66,16 +66,14 @@ TEST(memoryByteSourceTest, basic)
     EXPECT_EQ(0, src.available());
     EXPECT_ANY_THROW(src.skip(1));
     EXPECT_EQ(0, src.available());
-
-    delete[] data;
 }
 
 //------------------------------------------------------------------------------
 TEST(memoryByteSourceTest, skip)
 {
     const size_t size = 10;
-    auto data = generate_test_data(size);
-    memory_byte_source src(data, size);
+    std::unique_ptr<std::uint8_t[]> data{generate_test_data(size)};
+    memory_byte_source src(data.get(), size);
 
     check_get(src, 1, 1);
     EXPECT_EQ(size-1, src.available());
@@ -92,8 +90,8 @@ TEST(memoryByteSourceTest, skip)
 TEST(memoryByteSourceTest, seek)
 {
     const size_t size = 10;
-    auto data = generate_test_data(size);
-    memory_byte_source src(data, size);
+    std::unique_ptr<std::uint8_t[]> data{generate_test_data(size)};
+    memory_byte_source src(data.get(), size);
 
     check_get(src, 1, 1);
     EXPECT_EQ(size-1, src.available());
@@ -110,8 +108,8 @@ TEST(memoryByteSourceTest, seek)
 TEST(memoryByteSourceTest, clone)
 {
     const size_t size = 10;
-    auto data = generate_test_data(size);
-    memory_byte_source src(data, size);
+    std::unique_ptr<std::uint8_t[]> data{generate_test_data(size)};
+    memory_byte_source src(data.get(), size);
 
     EXPECT_NO_THROW(src.seek(size/2));
     auto clone = src.clone();

@@ -103,6 +103,7 @@ std::shared_ptr<shared_buffer::_internal> shared_buffer::make_internal(
                 delete[] ptr->data;
                 ptr->size = 0;
                 ptr->capacity = 0;
+                delete ptr;
             }
     );
 
