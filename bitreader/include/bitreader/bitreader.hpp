@@ -230,7 +230,8 @@ namespace brcpp {
         {
             state.shift -= bits;
             const auto shifted = static_cast<T>(state.buffer >> state.shift);
-            ret |= shifted & _mask<T>(bits);
+            const auto masked = static_cast<T>(shifted & _mask<T>(bits));
+            ret |= masked;
         }
 
         //----------------------------------------------------------------------

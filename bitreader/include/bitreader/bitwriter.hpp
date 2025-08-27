@@ -62,7 +62,7 @@ namespace brcpp {
                 size_t post = std::min<uint64_t>(_state.avail, to_write);
                 T portion = (data >> (bits - written - post)) & _mask<T>(post);
                 size_t diff = _state.avail - post;
-                _state.buffer |= portion << diff;
+                _state.buffer |= static_cast<internal_state::buffer_type>(portion << diff);
                 _state.avail -= post;
 
                 if (_state.avail == 0) {
