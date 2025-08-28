@@ -80,12 +80,14 @@ namespace brcpp {
          * @param bits  Number of bits to read
          * @return      The data read from the stream
          */
-        template<integral T>
+        template<bit_readable T>
         T read(size_t bits)
         {
+            using FT = fitting_integral<T>;
             _validate_read_dynamic<T>(bits);
-            T ret = T(0);
-            _read(_state, bits, ret);
+            T ret = zero<T>;
+            auto& raw = reinterpret_cast<FT&>(ret);
+            _read(_state, bits, raw);
             return _sign_extend(ret, bits);
         }
 
@@ -153,6 +155,13 @@ namespace brcpp {
 
         //----------------------------------------------------------------------
         template<unsigned_integral T>
+        T _sign_extend(T raw, size_t bits)
+        {
+            return raw;
+        }
+
+        //----------------------------------------------------------------------
+        template<floating_point T>
         T _sign_extend(T raw, size_t bits)
         {
             return raw;
@@ -277,8 +286,10 @@ namespace brcpp {
         template <typename T>
         void _validate_read_dynamic(size_t size) const
         {
-            assert(size <= bit_read_helper<T>::max_bits);
-            assert(size >= bit_read_helper<T>::min_bits);
+            if (size < bit_read_helper<T>::min_bits || size > bit_read_helper<T>::max_bits)
+            {
+                throw std::runtime_error("Invalid read size");
+            }
         }
 
         internal_state _state;

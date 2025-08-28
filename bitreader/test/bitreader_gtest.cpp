@@ -416,3 +416,113 @@ TEST(bitreaderTest, align_to_non_byte_boundary)
     EXPECT_EQ(5, br.position());
     EXPECT_EQ(11, br.available());
 }
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_float_aligned)
+{
+    const uint8_t data[] = {0x41, 0x48, 0xF5, 0xC3};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+
+    const uint32_t raw_expected = 0x4148F5C3;
+    const auto expected = *reinterpret_cast<const float*>(&raw_expected);
+    EXPECT_EQ(expected, br.read<float>(32));
+    EXPECT_EQ(32, br.position());
+    EXPECT_EQ(0, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_double_aligned)
+{
+    const uint8_t data[] = {0x40, 0x05, 0xBF, 0x0A, 0x8B, 0x14, 0x57, 0x62};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    
+    const uint64_t raw_expected = 0x4005BF0A8B145762;
+    const auto expected = *reinterpret_cast<const double*>(&raw_expected);
+    EXPECT_EQ(expected, br.read<double>(64));
+    EXPECT_EQ(64, br.position());
+    EXPECT_EQ(0, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_float_unaligned)
+{
+    const uint8_t data[] = {0x10, 0x20, 0x30, 0x40, 0x50};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    
+    br.skip(4);
+    
+    const uint32_t raw_expected = 0x02030405;
+    const auto expected = *reinterpret_cast<const float*>(&raw_expected);
+    EXPECT_EQ(expected, br.read<float>(32)); // exact eq
+    EXPECT_EQ(36, br.position());
+    EXPECT_EQ(4, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_double_unaligned)
+{
+    const uint8_t data[] = {0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+
+    br.skip(4);
+    
+    const uint64_t raw_expected = 0x0203'0405'0607'0809;
+    const auto expected = *reinterpret_cast<const double*>(&raw_expected);
+    EXPECT_EQ(expected, br.read<double>(64));
+    EXPECT_EQ(68, br.position());
+    EXPECT_EQ(4, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_double_wrong_size)
+{
+    const uint8_t data[] = {0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+
+    br.skip(4);
+    
+    EXPECT_THROW(br.read<double>(63), std::exception); // wrong size
+    EXPECT_EQ(4, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_float_wrong_size)
+{
+    const uint8_t data[] = {0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+
+    br.skip(4);
+    
+    EXPECT_THROW(br.read<float>(31), std::exception); // wrong size
+    EXPECT_EQ(4, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_float_insufficient_data)
+{
+    const uint8_t data[] = {0x41, 0x48, 0xF5}; // Only 3 bytes for float
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    
+    EXPECT_THROW(br.read<float>(32), std::exception);
+    EXPECT_EQ(0, br.position());
+    EXPECT_EQ(24, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_double_insufficient_data)
+{
+    const uint8_t data[] = {0x40, 0x05, 0xBF, 0x0A, 0x8B, 0x14, 0x57}; // Only 7 bytes for double
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    
+    EXPECT_THROW(br.read<double>(64), std::exception);
+    EXPECT_EQ(0, br.position());
+    EXPECT_EQ(56, br.available());
+}

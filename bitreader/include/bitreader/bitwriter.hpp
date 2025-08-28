@@ -52,15 +52,18 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
-        template<integral T>
+        template<bit_readable T>
         void write(T data, size_t bits)
         {
             size_t written = 0;
             size_t to_write = bits;
 
+            using FT = fitting_integral<T>;
+            const auto bit_data = *reinterpret_cast<const FT*>(&data);
+
             while (written < bits) {
                 size_t post = std::min<uint64_t>(_state.avail, to_write);
-                T portion = (data >> (bits - written - post)) & _mask<T>(post);
+                FT portion = (bit_data >> (bits - written - post)) & _mask<FT>(post);
                 size_t diff = _state.avail - post;
                 _state.buffer |= static_cast<internal_state::buffer_type>(portion << diff);
                 _state.avail -= post;

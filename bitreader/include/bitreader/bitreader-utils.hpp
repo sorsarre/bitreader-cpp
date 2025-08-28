@@ -22,9 +22,6 @@ namespace brcpp
     template<> struct integral_by_size<4>: id_t<uint32_t> {};
     template<> struct integral_by_size<8>: id_t<uint64_t> {};
 
-    template<typename Enum>
-    using fitting_integral = typename integral_by_size<sizeof(Enum)>::type;
-
     struct binary_codec_base {};
 
     template<typename T>
@@ -39,6 +36,12 @@ namespace brcpp
     using std::unsigned_integral;
     using std::signed_integral;
     using std::floating_point;
+
+    template<typename T>
+    concept bit_readable = integral<T> || floating_point<T>;
+
+    template<bit_readable T>
+    using fitting_integral = typename integral_by_size<sizeof(T)>::type;
 
     template<typename T>
     struct bit_read_helper {};
