@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 
 set(BRCPP_SANITIZER "none" CACHE STRING "Compile with a specific Clang sanitizer (address,undefined,leak,memory,type)")
 
@@ -29,7 +29,8 @@ if (NOT WIN32)
     endif()
     add_compile_options(-Wall -Wconversion -Wsign-conversion -Werror -pedantic)
 else()
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    message(STATUS "MSVC runtime: ${CMAKE_MSVC_RUNTIME_LIBRARY}")
 endif()
 
 set(BITREADER_SOURCES
