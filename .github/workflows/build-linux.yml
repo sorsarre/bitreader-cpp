@@ -9,6 +9,7 @@ on:
 env:
   BUILD_TYPE: Release
 
+# TODO: Use matrix instead
 jobs:
   build-gcc:
     runs-on: ubuntu-latest
