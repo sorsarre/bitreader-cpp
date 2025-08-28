@@ -28,6 +28,8 @@ if (NOT WIN32)
         add_compile_options(-Wshorten-64-to-32)
     endif()
     add_compile_options(-Wall -Wconversion -Wsign-conversion -Werror -pedantic)
+else()
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 set(BITREADER_SOURCES
