@@ -29,7 +29,7 @@ if (NOT WIN32)
     endif()
     add_compile_options(-Wall -Wconversion -Wsign-conversion -Werror -pedantic)
 else()
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 set(BITREADER_SOURCES
