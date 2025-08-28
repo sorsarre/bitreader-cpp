@@ -1,4 +1,7 @@
 # bitreader-cpp
+
+[![build-linux](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml/badge.svg)](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml)
+
 Bitstream reader implementation in C++
 
 At the time of writing, there was no de-facto standard library for bitwise reading operations for C++.
