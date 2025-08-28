@@ -42,7 +42,14 @@ namespace {
             size_t to_copy = std::min(_data.size() - position, bytes);
             auto begin = _data.begin() + position;
             auto end = begin + to_copy;
-            std::copy(begin, end, dest);
+            if (!dest)
+            {
+                to_copy = 0;
+            }
+            else
+            {
+                std::copy(begin, end, dest);
+            }
             return to_copy;
         }
 
