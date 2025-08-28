@@ -1,3 +1,4 @@
+#include <bit>
 #include <gtest/gtest.h>
 #include <bitreader/data_source/memory_byte_source.hpp>
 #include "bitreader/bitreader.hpp"
