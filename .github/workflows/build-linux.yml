@@ -22,9 +22,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: Bacondish2023/setup-googletest@v1
-      with:
-        tag: v1.17.0
+    - name: Install gtest manually
+      run: sudo apt-get install libgtest-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
