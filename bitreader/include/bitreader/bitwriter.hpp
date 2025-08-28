@@ -59,7 +59,7 @@ namespace brcpp {
             size_t to_write = bits;
 
             using FT = fitting_integral<T>;
-            const auto bit_data = *reinterpret_cast<const FT*>(&data);
+            const auto bit_data = std::bit_cast<FT>(data);
 
             while (written < bits) {
                 size_t post = std::min<uint64_t>(_state.avail, to_write);

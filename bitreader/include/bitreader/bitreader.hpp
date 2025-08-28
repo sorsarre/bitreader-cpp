@@ -85,10 +85,9 @@ namespace brcpp {
         {
             using FT = fitting_integral<T>;
             _validate_read_dynamic<T>(bits);
-            T ret = zero<T>;
-            auto& raw = reinterpret_cast<FT&>(ret);
+            auto raw = zero<FT>;
             _read(_state, bits, raw);
-            return _sign_extend(ret, bits);
+            return _sign_extend(std::bit_cast<T>(raw), bits);
         }
 
         template<binary_codec T>

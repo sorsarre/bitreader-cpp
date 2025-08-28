@@ -425,7 +425,7 @@ TEST(bitreaderTest, read_float_aligned)
     bitreader<source_t> br(source);
 
     const uint32_t raw_expected = 0x4148F5C3;
-    const auto expected = *reinterpret_cast<const float*>(&raw_expected);
+    const auto expected = std::bit_cast<float>(raw_expected);
     EXPECT_EQ(expected, br.read<float>(32));
     EXPECT_EQ(32, br.position());
     EXPECT_EQ(0, br.available());
@@ -439,7 +439,7 @@ TEST(bitreaderTest, read_double_aligned)
     bitreader<source_t> br(source);
     
     const uint64_t raw_expected = 0x4005BF0A8B145762;
-    const auto expected = *reinterpret_cast<const double*>(&raw_expected);
+    const auto expected = std::bit_cast<double>(raw_expected);
     EXPECT_EQ(expected, br.read<double>(64));
     EXPECT_EQ(64, br.position());
     EXPECT_EQ(0, br.available());
@@ -455,7 +455,7 @@ TEST(bitreaderTest, read_float_unaligned)
     br.skip(4);
     
     const uint32_t raw_expected = 0x02030405;
-    const auto expected = *reinterpret_cast<const float*>(&raw_expected);
+    const auto expected = std::bit_cast<float>(raw_expected);
     EXPECT_EQ(expected, br.read<float>(32)); // exact eq
     EXPECT_EQ(36, br.position());
     EXPECT_EQ(4, br.available());
@@ -471,7 +471,7 @@ TEST(bitreaderTest, read_double_unaligned)
     br.skip(4);
     
     const uint64_t raw_expected = 0x0203'0405'0607'0809;
-    const auto expected = *reinterpret_cast<const double*>(&raw_expected);
+    const auto expected = std::bit_cast<double>(raw_expected);
     EXPECT_EQ(expected, br.read<double>(64));
     EXPECT_EQ(68, br.position());
     EXPECT_EQ(4, br.available());
