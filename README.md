@@ -1,6 +1,6 @@
 # bitreader-cpp
 
-[![build-linux](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml/badge.svg)](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml)
+[![build-linux](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml/badge.svg)](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-linux.yml) [![build-windows](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-windows.yml/badge.svg)](https://github.com/sorsarre/bitreader-cpp/actions/workflows/build-windows.yml)
 
 Bitstream reader implementation in C++
 
