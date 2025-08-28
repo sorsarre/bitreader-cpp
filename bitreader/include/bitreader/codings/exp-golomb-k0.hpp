@@ -5,7 +5,7 @@
 namespace brcpp::ext
 {
     template<typename T>
-    struct exp_golomb_k0: public brcpp::binary_codec
+    struct exp_golomb_k0: public brcpp::binary_codec_base
     {
         using value_type = T;
 

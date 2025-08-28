@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cassert>
+#include <concepts>
 #include <stdexcept>
 #include <memory>
 
@@ -79,8 +80,8 @@ namespace brcpp {
          * @param bits  Number of bits to read
          * @return      The data read from the stream
          */
-        template<typename T>
-        if_integral<T> read(size_t bits)
+        template<integral T>
+        T read(size_t bits)
         {
             _validate_read_dynamic<T>(bits);
             T ret = T(0);
@@ -88,14 +89,14 @@ namespace brcpp {
             return _sign_extend(ret, bits);
         }
 
-        template<typename T>
-        if_binary_codec<T> read()
+        template<binary_codec T>
+        T::value_type read()
         {
             return T::read(*this);
         }
 
-        template<typename T>
-        if_enum<T> read(size_t bits)
+        template<enumeration T>
+        T read(size_t bits)
         {
             using value_type = std::underlying_type_t<T>;
             auto val = static_cast<T>(read<value_type>(bits));
@@ -116,8 +117,8 @@ namespace brcpp {
          * @param bits  Number of bits to read
          * @return      The data read from the stream
          */
-        template<typename T>
-        if_integral<T> peek(size_t bits)
+        template<integral T>
+        T peek(size_t bits)
         {
             _validate_read_dynamic<T>(bits);
             T ret = T(0);
@@ -143,16 +144,16 @@ namespace brcpp {
         };
 
         //----------------------------------------------------------------------
-        template<typename T>
-        if_signed_integral<T> _sign_extend(T raw, size_t bits)
+        template<signed_integral T>
+        T _sign_extend(T raw, size_t bits)
         {
             const auto m = static_cast<T>(one<T> << (bits - 1));
             return (raw ^ m) - m;
         }
 
         //----------------------------------------------------------------------
-        template<typename T>
-        if_unsigned_integral<T> _sign_extend(T raw, size_t bits)
+        template<unsigned_integral T>
+        T _sign_extend(T raw, size_t bits)
         {
             return raw;
         }

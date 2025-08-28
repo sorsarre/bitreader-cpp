@@ -5,7 +5,7 @@
 
 namespace brcpp::ext
 {
-    struct string_nullterm: public brcpp::binary_codec
+    struct string_nullterm: public brcpp::binary_codec_base
     {
         using value_type = std::string;
 

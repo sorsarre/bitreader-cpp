@@ -52,8 +52,8 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
-        template<typename T>
-        if_integral_void<T> write(T data, size_t bits)
+        template<integral T>
+        void write(T data, size_t bits)
         {
             size_t written = 0;
             size_t to_write = bits;
@@ -75,8 +75,8 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
-        template<typename T>
-        if_enum_void<T> write(T data, size_t bits)
+        template<enumeration T>
+        void write(T data, size_t bits)
         {
             using data_t = std::underlying_type_t<T>;
             auto value = static_cast<data_t>(data);
@@ -84,8 +84,8 @@ namespace brcpp {
         }
 
         //----------------------------------------------------------------------
-        template<typename T>
-        if_binary_codec_void<T> write(typename T::value_type data)
+        template<binary_codec T>
+        void write(T::value_type data)
         {
             T::write(*this, data);
         }
