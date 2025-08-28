@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 
 set(BRCPP_SANITIZER "none" CACHE STRING "Compile with a specific Clang sanitizer (address,undefined,leak,memory,type)")
 
-function(brcpp_add_cxx_flags FLAGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAGS}")
-endfunction()
-
-function(brcpp_add_exe_link_flags FLAGS)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${FLAGS}")
-endfunction()
-
 function(brcpp_enable_sanitizer SAN)
     if (NOT SAN MATCHES "none")
         if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -28,9 +20,6 @@ if (NOT WIN32)
         add_compile_options(-Wshorten-64-to-32)
     endif()
     add_compile_options(-Wall -Wconversion -Wsign-conversion -Werror -pedantic)
-else()
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    message(STATUS "MSVC runtime: ${CMAKE_MSVC_RUNTIME_LIBRARY}")
 endif()
 
 set(BITREADER_SOURCES
