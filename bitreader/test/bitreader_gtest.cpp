@@ -277,3 +277,142 @@ TEST(bitreaderTest, exp_golomb_k0)
     EXPECT_EQ(2, br.read<egc>());
     EXPECT_EQ(3, br.read<egc>());
 }
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_zero_bits)
+{
+    const uint8_t data[] = {0xAB, 0xCD};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_EQ(0, br.read<uint8_t>(0));
+    EXPECT_EQ(0, br.position());
+    EXPECT_EQ(16, br.available());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_more_than_available)
+{
+    const uint8_t data[] = {0xAB, 0xCD};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_THROW(br.read<uint32_t>(24), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_from_empty_source)
+{
+    const uint8_t data[] = {0x00};
+    auto source = std::make_shared<source_t>(data, 0);
+    bitreader<source_t> br(source);
+    EXPECT_EQ(0, br.available());
+    EXPECT_THROW(br.read<uint8_t>(1), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, skip_more_than_available)
+{
+    const uint8_t data[] = {0xAB, 0xCD};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_THROW(br.skip(17), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, peek_after_end)
+{
+    const uint8_t data[] = {0xAB, 0xCD};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_NO_THROW(br.skip(16));
+    EXPECT_EQ(0, br.available());
+    EXPECT_THROW(br.peek<uint8_t>(1), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, align_at_end)
+{
+    const uint8_t data[] = {0xAB, 0xCD};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_NO_THROW(br.skip(16));
+    EXPECT_EQ(16, br.position());
+    EXPECT_NO_THROW(br.align(8));
+    EXPECT_EQ(16, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_exact_64_then_one)
+{
+    const uint8_t data[] = {
+        0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08
+    };
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_EQ(0x0102030405060708, br.read<uint64_t>(64));
+    EXPECT_EQ(64, br.position());
+    EXPECT_EQ(0, br.available());
+    EXPECT_THROW(br.read<uint8_t>(1), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_various_types)
+{
+    const uint8_t data[] = {0x12, 0x34, 0x56, 0x78};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_EQ(0x1234, br.read<uint16_t>(16));
+    EXPECT_EQ(16, br.position());
+    EXPECT_EQ(0x5678, br.read<uint16_t>(16));
+    EXPECT_EQ(32, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, read_signed_cross_boundary)
+{
+    const uint8_t data[] = {0xFF, 0x7F}; // -1, 127
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_EQ(-1, br.read<int8_t>(8));
+    EXPECT_EQ(8, br.position());
+    EXPECT_EQ(127, br.read<int8_t>(8));
+    EXPECT_EQ(16, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, skip_to_end_and_read)
+{
+    const uint8_t data[] = {0xAA, 0xBB, 0xCC};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_NO_THROW(br.skip(24));
+    EXPECT_EQ(24, br.position());
+    EXPECT_EQ(0, br.available());
+    EXPECT_THROW(br.read<uint8_t>(1), std::exception);
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, peek_various_types)
+{
+    const uint8_t data[] = {0xDE, 0xAD, 0xBE, 0xEF};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_EQ(0xDEADBEEF, br.peek<uint32_t>(32));
+    EXPECT_EQ(0, br.position());
+    EXPECT_EQ(0xDEAD, br.peek<uint16_t>(16));
+    EXPECT_EQ(0, br.position());
+    EXPECT_EQ(0xDE, br.peek<uint8_t>(8));
+    EXPECT_EQ(0, br.position());
+}
+
+//------------------------------------------------------------------------------
+TEST(bitreaderTest, align_to_non_byte_boundary)
+{
+    const uint8_t data[] = {0xF0, 0x0F};
+    auto source = std::make_shared<source_t>(data, sizeof(data));
+    bitreader<source_t> br(source);
+    EXPECT_NO_THROW(br.skip(3));
+    EXPECT_EQ(3, br.position());
+    EXPECT_NO_THROW(br.align(5));
+    EXPECT_EQ(5, br.position());
+    EXPECT_EQ(11, br.available());
+}

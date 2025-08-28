@@ -3,7 +3,11 @@ cmake_minimum_required(VERSION 3.15)
 enable_testing()
 
 ############# Bitreader gtest
-add_executable(bitreader_gtest bitreader_gtest.cpp bitwriter_gtest.cpp)
+add_executable(
+        bitreader_gtest
+        bitreader_gtest.cpp
+        bitwriter_gtest.cpp
+)
 
 target_include_directories(bitreader_gtest PRIVATE ${GTEST_INCLUDE_DIRS})
 

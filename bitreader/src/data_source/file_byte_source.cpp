@@ -15,6 +15,10 @@ file_byte_source::file_byte_source(std::shared_ptr<file_reader> reader)
 
 //----------------------------------------------------------------------
 size_t file_byte_source::get_n(uint64_t& buf, size_t bytes) {
+    if (bytes == 0) {
+        return 0;
+    }
+
     if (
             _position < _last ||
             _position + bytes >= _last + _buffer.size() ||

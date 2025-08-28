@@ -18,6 +18,10 @@ memory_byte_source::memory_byte_source(const uint8_t* data, size_t size)
 //----------------------------------------------------------------------
 size_t memory_byte_source::get_n(uint64_t& buf, size_t bytes)
 {
+    if (bytes == 0) {
+        return 0;
+    }
+
     if (_current == _data.end()) {
         throw std::runtime_error("Access beyond data buffer boundaries");
     }
