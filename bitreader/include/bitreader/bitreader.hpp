@@ -9,12 +9,13 @@
 
 #include "bitreader/bitreader-utils.hpp"
 #include "common/numeric.hpp"
+#include "data_source/byte_source.hpp"
 
 namespace brcpp {
 
 
     //--------------------------------------------------------------------------
-    template<typename Source>
+    template<byte_source Source>
     class bitreader {
     public:
         bitreader(std::shared_ptr<Source> source)
@@ -101,8 +102,7 @@ namespace brcpp {
         T read(size_t bits)
         {
             using value_type = std::underlying_type_t<T>;
-            auto val = static_cast<T>(read<value_type>(bits));
-            return val;
+            return static_cast<T>(read<value_type>(bits));
         }
 
         //----------------------------------------------------------------------
@@ -146,25 +146,18 @@ namespace brcpp {
         };
 
         //----------------------------------------------------------------------
-        template<signed_integral T>
+        template<bit_readable T>
         T _sign_extend(T raw, size_t bits)
         {
-            const auto m = static_cast<T>(one<T> << (bits - 1));
-            return (raw ^ m) - m;
-        }
-
-        //----------------------------------------------------------------------
-        template<unsigned_integral T>
-        T _sign_extend(T raw, size_t bits)
-        {
-            return raw;
-        }
-
-        //----------------------------------------------------------------------
-        template<floating_point T>
-        T _sign_extend(T raw, size_t bits)
-        {
-            return raw;
+            if constexpr (signed_integral<T>)
+            {
+                const auto m = static_cast<T>(one<T> << (bits - 1));
+                return (raw ^ m) - m;
+            }
+            else
+            {
+                return raw;
+            }
         }
 
         //----------------------------------------------------------------------
